@@ -1,13 +1,14 @@
 import sqlite3
 import sys
-from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QWidget, QButtonGroup
+from UI.mainUI import Ui_MainWindow
+from UI.addEditCoffeeForm import Ui_Form
 
 
-class AddEdit(QWidget):
+class AddEdit(QWidget, Ui_Form):
     def __init__(self, con, update_table, to_edit=None):
         super().__init__()
-        uic.loadUi('addEditCoffeeForm.ui', self)
+        self.setupUi(self)
         self.con = con
         self.to_edit = to_edit
         self.update_table = update_table
@@ -21,7 +22,7 @@ class AddEdit(QWidget):
             self.add_edit_btn.setText('Изменить')
             self.name.setText(to_edit[1])
             self.degree.setText(to_edit[2])
-            if to_edit[3]:
+            if to_edit[3] == 'молотый':
                 self.state_0.setChecked(1)
                 self.state_1.setChecked(0)
             else:
@@ -42,7 +43,7 @@ class AddEdit(QWidget):
             if self.degree.text() != self.to_edit[2]:
                 self.modified['degree'] = self.degree.text()
             if self.state_0.isChecked() != self.to_edit[3]:
-                self.modified['is_ground'] = self.state_0.isChecked()
+                self.modified['is_ground'] = int(self.state_0.isChecked())
             if self.description.toPlainText() != self.to_edit[4]:
                 self.modified['description'] = self.description.toPlainText()
             if self.price.value() != self.to_edit[5]:
@@ -90,11 +91,11 @@ class AddEdit(QWidget):
         self.close()
 
 
-class MyWindow(QMainWindow):
+class MyWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('main.ui', self)
-        self.connection = sqlite3.connect("coffee.sqlite")
+        self.setupUi(self)
+        self.connection = sqlite3.connect("../data/coffee.sqlite")
         self.update_table()
         self.add_btn.clicked.connect(self.open_add)
         self.edit_btn.clicked.connect(self.open_edit)
